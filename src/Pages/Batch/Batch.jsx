@@ -18,7 +18,7 @@ const Batch = ({ user, batch, setBatch }) => {
 
   const getBatches = async () => {
     try {
-      const res = await axios.get("http://localhost:3001/api/batch/");
+      const res = await axios.get(`${BASEURL}api/batch/`);
       if (res.status === 200) {
         setBatches(res.data);
       }
@@ -38,7 +38,7 @@ const Batch = ({ user, batch, setBatch }) => {
     try {
       if (user._id) {
         await axios
-          .get(`http://localhost:3001/api/batch/user/${user._id}`)
+          .get(`${BASEURL}api/batch/user/${user._id}`)
           .then((res) => {
             setCurrentBranch(res.data);
             dispatch(GET_BATCH(res?.data));
