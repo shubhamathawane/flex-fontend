@@ -1,14 +1,20 @@
 // BatchSelectionComponent.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { UPDATE_SUCCESS } from "../../Features/UserSlice";
+import { GET_BATCH } from "../../Features/BatchSlice";
+import { BASEURL } from "../../api/api";
 
-const Batch = ({ user }) => {
+const Batch = ({ user, batch, setBatch }) => {
   const [batches, setBatches] = useState([]);
-  const [batch, setBatch] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [error, setError] = useState(false);
+  const [currentBranch, setCurrentBranch] = useState([]);
 
-  console.log(user?.userBatch?.batchTimesId?.end_time);
+  const dispatch = useDispatch();
+
+  // console.log(user?.userBatch?.batchTimesId?.end_time);
 
   const getBatches = async () => {
     try {
@@ -28,18 +34,44 @@ const Batch = ({ user }) => {
     }
   }, 5000);
 
+  const getCurrentBranch = async () => {
+    try {
+      if (user._id) {
+        await axios
+          .get(`http://localhost:3001/api/batch/user/${user._id}`)
+          .then((res) => {
+            setCurrentBranch(res.data);
+            dispatch(GET_BATCH(res?.data));
+          });
+      } else {
+        console.log("first");
+      }
+    } catch (err) {
+      // setError(true);
+      setErrorMessage("error");
+    }
+  };
+
   const submitBatch = async (userId) => {
     try {
       if (userId && batch) {
-        const res = await axios.put(
-          `http://localhost:3001/api/batch/user/${userId}`,
+        const res = await axios.post(
+          `${BASEURL}api/batch/updatebatchtiming/`,
           {
-            newBatchId: batch,
+            batchId: batch,
+            userId: user._id,
           }
         );
 
-        if (res.status === 200) {
+        if (res.status === 201) {
+          getCurrentBranch()
           alert("Batch selected successfully!");
+          await axios
+            .get(`${BASEURL}api/user/${user._id}`)
+            .then((res) => {
+              dispatch(UPDATE_SUCCESS(res?.data));
+              localStorage.setItem("batch", JSON.stringify(res?.data));
+            });
         }
       } else {
         setError(true);
@@ -53,6 +85,7 @@ const Batch = ({ user }) => {
 
   useEffect(() => {
     getBatches();
+    getCurrentBranch();
   }, []);
 
   return (
@@ -89,18 +122,19 @@ const Batch = ({ user }) => {
           )}
         </div>
       </div>
-      <div className="mt-5 border p-4">
-        {user?.userBatch?.batchTimesId && (
+
+      {currentBranch?.batchTimings?.start_time && (
+        <div className="mt-5 border p-4">
           <>
             <h4>Your Current Batch : </h4>
             <p>
-              {user?.userBatch?.batchTimesId.start_time +
-                " " +
-                user?.userBatch?.batchTimesId.end_time}
+              {currentBranch?.batchTimings?.start_time +
+                " to " +
+                currentBranch?.batchTimings?.end_time}
             </p>
           </>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

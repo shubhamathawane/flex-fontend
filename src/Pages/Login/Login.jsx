@@ -8,6 +8,7 @@ import {
   LOGIN_SUCCESS,
 } from "../../Features/UserSlice";
 import axios from "axios";
+import { BASEURL } from "../../api/api";
 
 const Login = () => {
   const userRef = useRef();
@@ -25,7 +26,7 @@ const Login = () => {
     e.preventDefault();
     dispatch(LOGIN_START());
     try {
-      const res = await axios.post("http://localhost:3001/api/auth/login", {
+      const res = await axios.post(`${BASEURL}api/auth/login`, {
         email: userRef.current.value,
         password: passwordRef.current.value,
       });
@@ -51,8 +52,8 @@ const Login = () => {
             <div class="row gx-lg-5 align-items-center">
               <div class="col-lg-6 mb-5 mb-lg-0">
                 <h1 class="my-5 display-3 fw-bold ls-tight">
-                  The best offer <br />
-                  <span class="text-success">for your business</span>
+                  The best Mind <br />
+                  <span class="text-success">for your Health</span>
                 </h1>
                 <p style={{ color: "hsl(217, 10%, 50.8%)" }}>
                   Lorem ipsum dolor sit amet consectetur adipisicing elit.

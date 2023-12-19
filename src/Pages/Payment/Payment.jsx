@@ -1,22 +1,25 @@
 import axios from "axios";
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { UPDATE_SUCCESS } from "../../Features/UserSlice";
+import { BASEURL } from "../../api/api";
 
-const Payment = ({ user }) => {
-
+const Payment = ({ user, batch }) => {
   console.log(user);
-  console.log(!user.payment_status);
 
   const dispatch = useDispatch();
+  const [isPaymentAlready, setIsPaymentAlready] = useState(false);
 
-  const handlePayment = async (userId) => {
+  const handlePayment = async () => {
     try {
-      const res = await axios.put(
-        `http://localhost:3001/api/payment/${userId}`
-      );
+      const res = await axios.post(`${BASEURL}api/payment/pay`, {
+        userId: user._id,
+        userBatchId: batch,
+        amountPaid: 500,
+        paymentMethod: "upi",
+      });
 
-      if (res.status == 200) {
+      if (res.status == 201) {
         alert("Payment Successful!");
         const updatedUser = { ...user, payment_status: true }; // Update the user locally
         dispatch(UPDATE_SUCCESS(updatedUser));
@@ -24,7 +27,7 @@ const Payment = ({ user }) => {
         console.log(res);
       }
     } catch (err) {
-      alert(err);
+      alert(err?.response?.data?.message);
     }
   };
 

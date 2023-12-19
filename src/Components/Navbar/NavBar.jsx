@@ -2,12 +2,15 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { LOGOUT } from "../../Features/UserSlice";
+import { CLEAR_BATCH } from "../../Features/BatchSlice";
 const NavBar = () => {
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
   const handleLogout = () => {
     dispatch(LOGOUT());
+    dispatch(CLEAR_BATCH());
     localStorage.removeItem("user");
+    localStorage.removeItem("batch");
   };
 
   return (
